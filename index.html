@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <title>App de reconhecimento de Gestos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Boostrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+    <!-- Estilo customizado -->
+    <link rel="stylesheet" href="./assets/styles/index.css" />
+    <!-- FA Icons -->
+    <script src="https://kit.fontawesome.com/c27ffa2f00.js" crossorigin="anonymous"></script>
+    <!-- ml5 -->
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+    <!-- Defer, o script será executado após pagina HTML tiver sido toda analisada
+    mas o download é feito no background assincronamente-->
+    <script defer src="./assets/scripts/index.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <!-- Area com header do site -->
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-5 text-center">
+                <img src="./assets/images/palm-scanner.png" alt="Gesture Icon" width="85px" class="img-fluid" />
+                <h1 id="app-title" class="fs-4 fw-bold">Recognition App</h1>
+            </div>
+        </div>
+        <!-- Area com video e uma mensagem de erro caso o video nao seja suportado -->
+        <div class="row justify-content-center mt-2">
+            <div class="col-md-4 text-center mt-2">
+                <video autoplay="true" id="webcam" class="hide rounded"></video>
+                <canvas id="webcamCanvas" class="hide"></canvas>
+            </div>
+            <div class="col-md-3 text-center mt-2 mb-2 align-self-center">
+                <div class="card hide" id="card-gesture-indicator">
+                    <h5 class="card-title mt-2 fw-bold">Gesto Reconhecido</h5>
+                    <div class="card-body mb-4">
+                        <img src="./assets/images/palm-scanner.png" alt="gesture recognized">
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-12 text-center">
+                            <button class="btn btn-outline-primary mb-2 me-1" id="btTrain" type="button">
+                                Treinar
+                            </button>
+                            <button class="btn btn-outline-primary mb-2 me-1" id="btSave" type="button">
+                                Salvar
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-2">
+            <div class="col-md-3 hide text-center" id="errorVideo"></div>
+        </div>
+        <!-- Area com os botões -->
+        <div class="row justify-content-center mt-2">
+            <div class="col-md-4 text-center">
+                <p>Adicionar exemplos</p>
+                <button class="btn btn-outline-success mb-2 me-1" id="btUp" type="button"><i
+                        class="fa-solid fa-hand-point-up fa-beat"></i>
+                </button>
+                <button class="btn btn-outline-dark mb-2 me-1" id="btRight" type="button"><i
+                        class="fa-solid fa-hand-point-right fa-beat"></i>
+                </button>
+                <button class="btn btn-outline-success mb-2 me-1" id="btDown" type="button"><i
+                        class="fa-solid fa-hand-point-down fa-beat"></i>
+                </button>
+                <button class="btn btn-outline-dark mb-2 me-1" id="btLeft" type="button"><i
+                        class="fa-solid fa-hand-point-left fa-beat"></i>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
