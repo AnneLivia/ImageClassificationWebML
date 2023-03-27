@@ -1,44 +1,85 @@
 // Executar quando html tiver sido carregado
 document.addEventListener('DOMContentLoaded', async () => {
   // obtendo as divs
-  const errorVideoDiv = document.querySelector('#errorVideo');
-  const gestureIndicatorDiv = document.querySelector('#card-gesture-indicator');
+  const errorVideoIndicatorArea = document.querySelector(
+    '#errorVideoIndicatorArea'
+  );
 
-  // botões
-  const btUp = document.querySelector('#btUp');
-  const btDown = document.querySelector('#btDown');
-  const btLeft = document.querySelector('#btLeft');
-  const btRight = document.querySelector('#btRight');
+  const modelFeedbackIndicatorArea = document.querySelector(
+    '#modelFeedbackIndicatorArea'
+  );
 
-  const btTrain = document.querySelector('#btTrain');
-  const btSave = document.querySelector('#btSave');
+  const insertNewExamplesArea = document.querySelector(
+    '#insertNewExamplesArea'
+  );
 
-  // div de video e canvas
-  const videoDiv = document.querySelector('#webcam');
-  // para obter os pixels do video
-  const webcamCanvas = document.querySelector('#webcamCanvas');
-  const context = webcamCanvas.getContext('2d');
+  const detectedGestureIndicatorArea = document.querySelector(
+    '#detectedGestureIndicatorArea'
+  );
 
-  // constantes para ser usada durante treinamento
-  const VIDEO_CHANNELS = 4;
-  const VIDEO_WIDTH = 640;
-  const VIDEO_HEIGHT = 480;
+  // para mostrar as classes detectadas
+  const recognizedClassImage = document.querySelector('#recognizedClassImage');
 
-  videoDiv.width = VIDEO_WIDTH;
-  videoDiv.height = VIDEO_HEIGHT;
+  // div de video e canvas para obter os pixels do video
+  const video = document.querySelector('#webcam');
+
+  // referencia para todos os botões
+  const btUp = document.querySelector('#btAddExampleUp');
+  const btDown = document.querySelector('#btAddExampleDown');
+  const btLeft = document.querySelector('#btAddExampleLeft');
+  const btRight = document.querySelector('#btAddExampleRight');
+  const btNegative = document.querySelector('#btAddExampleNegative');
+
+  const btTrainModel = document.querySelector('#btTrainModel');
+  const btSaveModel = document.querySelector('#btSaveModel');
+  const btStartClassification = document.querySelector(
+    '#btStartClassification'
+  );
+  const btStoplassification = document.querySelector('#btStoplassification');
+
+  // loading
+  const loading = document.querySelector('#loading');
+
+  // para mostrar quantidade de exemplos inseridos
+  const totalExamplesAddedToTrain = {
+    up: { quantity: 0, document: document.querySelector('#numberExamplesUp') },
+    left: {
+      quantity: 0,
+      document: document.querySelector('#numberExamplesLeft'),
+    },
+    right: {
+      quantity: 0,
+      document: document.querySelector('#numberExamplesRight'),
+    },
+    down: {
+      quantity: 0,
+      document: document.querySelector('#numberExamplesDown'),
+    },
+    negative: {
+      quantity: 0,
+      document: document.querySelector('#numberExamplesNegative'),
+    },
+  };
+
+  let overallTotal = 0;
+
+  let shouldClassify = false;
 
   // verificar se a webcam é suportada pelo browser
   if (navigator.mediaDevices.getUserMedia) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      videoDiv.srcObject = stream;
+      const videoStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+      });
+      video.srcObject = videoStream;
+
+      video.play();
       // exibindo video e card com indicação de gesto
-      videoDiv.classList.remove('hide');
-      gestureIndicatorDiv.classList.remove('hide');
-      videoDiv.play();
+      video.classList.remove('hide');
+      insertNewExamplesArea.classList.remove('hide');
     } catch (error) {
-      errorVideoDiv.classList.remove('hide');
-      errorVideoDiv.innerHTML =
+      errorVideoIndicatorArea.classList.remove('hide');
+      errorVideoIndicatorArea.innerHTML =
         "<img src='./assets/images/no-video.png' alt='No video icon' />" +
         "<p class='mt-3'>Não foi possível acessar a sua Webcam</p>";
 
@@ -46,53 +87,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // setup inicial da rede neural
-  let options = {
-    task: 'imageClassification',
-    debug: true, // mostra visualização do treinamento
-    inputs: [VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_CHANNELS],
+  const CLASSIFIER_OPTIONS = {
+    hiddenUnits: 100,
+    epochs: 30,
+    numLabels: 5,
   };
 
-  // inicializar a rede neural
-  const CNNClassifier = ml5.neuralNetwork(options);
+  // Primeiro passo de transfer learning é extrair features já aprendidas do MobileNet
+  const featureExtractor = ml5.featureExtractor('MobileNet', CLASSIFIER_OPTIONS, () => {
+    console.log('Modelo carregado!');
+  });
 
-  const getFramePixels = () => {
-    // definindo altura e largura exata do canvas
-    webcamCanvas.width = VIDEO_WIDTH;
-    webcamCanvas.height = VIDEO_HEIGHT;
+  // criando um modelo que usa essa caracteristicas
+  const CustomModelClassifier = featureExtractor.classification(video, () => {
+    console.log('Vídeo iniciado com sucesso!');
+  });
 
-    // desenhando imagem do video no canvas para pegar os pixels
-    context.drawImage(videoDiv, 0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
+  const addNewTrainData = async (label) => {
+    totalExamplesAddedToTrain[label].document.innerText =
+      ++totalExamplesAddedToTrain[label].quantity;
 
-    // getImage data retorna RGBA
-    const imageData = context.getImageData(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
-
-    return [...imageData.data];
-  };
-
-  const addNewTrainData = (label) => {
-    // colocando apenas pixels da imagem
-    let input = { image: getFramePixels() };
-    let target = { label };
-
-    console.log(`Exemplo de ${label} adicionado`);
+    overallTotal += 1;
 
     // adicionando dado na rede neural
-    CNNClassifier.addData(input, target);
-  };
-
-  const classifyImage = () => {
-    let input = { image: getFramePixels() };
-    CNNClassifier.classify(input, getResults);
-  };
-
-  const getResults = (error, results) => {
-    if (error) {
-      console.log(error.message);
-      return;
-    }
-    console.log(results);
-    classifyImage();
+    CustomModelClassifier.addImage(label, () => {
+      console.log(`Exemplo de ${label} adicionado`);
+    });
   };
 
   btUp.addEventListener('click', () => {
@@ -100,31 +120,78 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   btDown.addEventListener('click', () => {
-    addNewTrainData('Down');
+    addNewTrainData('down');
   });
 
   btLeft.addEventListener('click', () => {
-    addNewTrainData('Left');
+    addNewTrainData('left');
   });
 
   btRight.addEventListener('click', () => {
-    addNewTrainData('Right');
+    addNewTrainData('right');
   });
 
-  btTrain.addEventListener('click', () => {
-    CNNClassifier.normalizeData();
-    CNNClassifier.train(
-      {
-        epochs: 3,
-      },
-      () => {
+  btNegative.addEventListener('click', () => {
+    addNewTrainData('negative');
+  });
+
+  btTrainModel.addEventListener('click', () => {
+    if (overallTotal <= 2) {
+      modelFeedbackIndicatorArea.classList.remove('hide');
+      return (modelFeedbackIndicatorArea.innerText =
+        'Insira mais imagens para treinamento');
+    }
+
+    loading.classList.remove('hideButWithDivSpaceLeft');
+    modelFeedbackIndicatorArea.classList.add('hide');
+    CustomModelClassifier.train((loss) => {
+      if (loss !== null) console.log(`Loss: ${loss}`);
+      else {
         console.log('Treinamento finalizado');
-        classifyImage();
+        loading.classList.add('hideButWithDivSpaceLeft');
+        modelFeedbackIndicatorArea.classList.remove('hide');
+        modelFeedbackIndicatorArea.innerText = 'O Modelo está pronto';
       }
-    );
+    });
   });
 
-  btSave.addEventListener('click', () => {
-    CNNClassifier.saveData();
+  btSaveModel.addEventListener('click', () => {
+    if (CustomModelClassifier.customModel) return CustomModelClassifier.save();
+
+    modelFeedbackIndicatorArea.classList.remove('hide');
+    modelFeedbackIndicatorArea.innerText =
+      'Treine um novo modelo antes de salvar';
+  });
+
+  const getLabelsReturnedFromModel = (error, results) => {
+    if (error) {
+      return console.log(error.message);
+    }
+
+    recognizedClassImage.src = `./assets/images/${results[0].label}.png`;
+
+    console.log(`Label: ${results[0].label} - ${results[0].confidence}`);
+    if (shouldClassify)
+      CustomModelClassifier.classify(getLabelsReturnedFromModel);
+  };
+
+  btStartClassification.addEventListener('click', () => {
+    if (CustomModelClassifier.customModel) {
+      shouldClassify = true;
+      // para mostrar os resultados e escoder área para retreinamento
+      detectedGestureIndicatorArea.classList.remove('hide');
+      insertNewExamplesArea.classList.add('hide');
+      return CustomModelClassifier.classify(getLabelsReturnedFromModel);
+    }
+
+    modelFeedbackIndicatorArea.classList.remove('hide');
+    modelFeedbackIndicatorArea.innerText =
+      'Treine um novo modelo antes de iniciar a classificação';
+  });
+
+  btStoplassification.addEventListener('click', () => {
+    detectedGestureIndicatorArea.classList.add('hide');
+    insertNewExamplesArea.classList.remove('hide');
+    shouldClassify = false;
   });
 });
