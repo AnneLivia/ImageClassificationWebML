@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btStartClassification = document.querySelector(
     '#btStartClassification'
   );
+
+  const btLoadModel = document.querySelector("#btLoadModel");
+  const modelDataFiles = document.querySelector("#modelDataFiles");
+
   const btStoplassification = document.querySelector('#btStoplassification');
 
   // loading
@@ -62,8 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   let overallTotal = 0;
-
   let shouldClassify = false;
+  let modelLoaded = false;
 
   // verificar se a webcam é suportada pelo browser
   if (navigator.mediaDevices.getUserMedia) {
@@ -176,7 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   btStartClassification.addEventListener('click', () => {
-    if (CustomModelClassifier.customModel) {
+    if (CustomModelClassifier.customModel || modelLoaded) {
       shouldClassify = true;
       // para mostrar os resultados e escoder área para retreinamento
       detectedGestureIndicatorArea.classList.remove('hide');
@@ -194,4 +198,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     insertNewExamplesArea.classList.remove('hide');
     shouldClassify = false;
   });
+
+  btLoadModel.addEventListener('click', () => {
+    modelDataFiles.click(); 
+  });
+  
+
+  modelDataFiles.addEventListener('change', async (e) => {
+      if (CustomModelClassifier) {
+        modelFeedbackIndicatorArea.classList.remove('hide');
+        try {
+          await CustomModelClassifier.load(e.target.files);
+          modelFeedbackIndicatorArea.innerText = 'Modelo carregado com sucesso';
+          modelLoaded = true;
+        } catch (error) {
+          modelFeedbackIndicatorArea.innerText = 'Erro ao carregar o modelo';
+          console.log(error);
+        }
+      }
+    });
 });
