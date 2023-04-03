@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // botões para manipulação do modelo
   const btTrainModel = document.querySelector('#btTrainModel');
   const btSaveModel = document.querySelector('#btSaveModel');
-  const btLoadModel = document.querySelector("#btLoadModel");
+  const btLoadModel = document.querySelector('#btLoadModel');
 
   // botões para iniciar classificação e parar caso haja modelo treinado ou carregado
   const btStartClassification = document.querySelector(
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btStoplassification = document.querySelector('#btStoplassification');
 
   // input referente a inserção dos arquivos do modelo baixado (model e weights)
-  const modelDataFiles = document.querySelector("#modelDataFiles");
+  const modelDataFiles = document.querySelector('#modelDataFiles');
 
   // loading spinner
   const loading = document.querySelector('#loading');
@@ -54,13 +54,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // cada key possui a quantidade para concatenar na medida em que novos itens
   // são inseridos e o documento referente ao span para exibição do número na interface
   const totalExamplesAddedToTrain = {
-    up: { 
-      quantity: 0, 
-      document: document.querySelector('#numberExamplesUp') 
+    up: {
+      quantity: 0,
+      document: document.querySelector('#numberExamplesUp'),
     },
     left: {
       quantity: 0,
-      document: document.querySelector('#numberExamplesLeft'), 
+      document: document.querySelector('#numberExamplesLeft'),
     },
     right: {
       quantity: 0,
@@ -87,20 +87,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   // para precionar as arrow keys
   const keys = {
     up: new KeyboardEvent('keydown', {
-      key: 'ArrowUp'
+      key: 'ArrowUp',
     }),
     down: new KeyboardEvent('keydown', {
-      key: 'ArrowDown'
+      key: 'ArrowDown',
     }),
-  
+
     left: new KeyboardEvent('keydown', {
-      key: 'ArrowLeft'
+      key: 'ArrowLeft',
     }),
     right: new KeyboardEvent('keydown', {
-      key: 'ArrowRight'
+      key: 'ArrowRight',
     }),
-  }
-  
+  };
 
   // verificar se a webcam é suportada pelo browser
   if (navigator.mediaDevices.getUserMedia) {
@@ -108,7 +107,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       const videoStream = await navigator.mediaDevices.getUserMedia({
         video: true,
       });
+
       video.srcObject = videoStream;
+
+      // deixando a imagem espelhada, através de um flip na horizontal
+      video.style.webkitTransform = 'scaleX(-1)';
+      video.style.transform = 'scaleX(-1)';
 
       video.play();
       // exibindo video e card com indicação de gesto
@@ -132,9 +136,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   // Primeiro passo de transfer learning é extrair features já aprendidas do MobileNet
-  const featureExtractor = ml5.featureExtractor('MobileNet', CLASSIFIER_OPTIONS, () => {
-    console.log('Modelo carregado!');
-  });
+  const featureExtractor = ml5.featureExtractor(
+    'MobileNet',
+    CLASSIFIER_OPTIONS,
+    () => {
+      console.log('Modelo carregado!');
+    }
+  );
 
   // criando um modelo que usa essa caracteristicas e passando o video que é onde será
   // obtidos os exemplos para treinamento e classificação
@@ -217,11 +225,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // metodo usado para controlar as arrow keys do teclado
   const controlArrowKeysBasedOnALabel = (label) => {
     // se não for a classe negativa, pode executar porque é a arrow key
-    if (label !== 'negative')  {
+    if (label !== 'negative') {
       console.log(document.dispatchEvent(keys[label]));
       document.dispatchEvent(keys[label]);
-  }
-  }
+    }
+  };
 
   // metodo usado dentro de classify para exibir resultado ou erro caso haja algum
   const getLabelsReturnedFromModel = (error, results) => {
@@ -269,24 +277,52 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // botão que abri janela para inserção de arquivos do modelo
   btLoadModel.addEventListener('click', () => {
-    modelDataFiles.click(); 
+    modelDataFiles.click();
   });
-  
+
   modelDataFiles.addEventListener('change', async (e) => {
-      if (CustomModelClassifier) {
-        modelFeedbackIndicatorArea.classList.remove('hide');
-        try {
-          // passando os arquivos weights e model.json
-          await CustomModelClassifier.load(e.target.files);
-          // informando que modelo foi carregado na interface
-          modelFeedbackIndicatorArea.innerText = 'Modelo carregado com sucesso';
-          // para permitir que o modelo carregado possa ser usado na classificação em loop quando
-          // usuario clicar em classificar
-          modelLoaded = true;
-        } catch (error) {
-          modelFeedbackIndicatorArea.innerText = 'Erro ao carregar o modelo';
-          console.log(error);
-        }
+    if (CustomModelClassifier) {
+      modelFeedbackIndicatorArea.classList.remove('hide');
+      try {
+        // passando os arquivos weights e model.json
+        await CustomModelClassifier.load(e.target.files);
+        // informando que modelo foi carregado na interface
+        modelFeedbackIndicatorArea.innerText = 'Modelo carregado com sucesso';
+        // para permitir que o modelo carregado possa ser usado na classificação em loop quando
+        // usuario clicar em classificar
+        modelLoaded = true;
+      } catch (error) {
+        modelFeedbackIndicatorArea.innerText = 'Erro ao carregar o modelo';
+        console.log(error);
       }
+    }
+  });
+
+  // Os Códigos abaixo incluem hover effects em todos os botões
+  const listOfButtonsElementsToAddHover = [
+    btTrainModel,
+    btSaveModel,
+    btLoadModel,
+    btStartClassification,
+    btStoplassification,
+    btDown,
+    btLeft,
+    btUp,
+    btRight,
+    btNegative,
+  ];
+
+  listOfButtonsElementsToAddHover.forEach((element) => {
+    const animation = 'fa-beat-fade';
+    
+    element.addEventListener('mouseover', () => {
+      // obtendo primeiro elemento do botão que é o <i> e colocando a animação
+      element.firstElementChild.classList.add(animation);
     });
+
+    element.addEventListener('mouseout', () => {
+      // obtendo primeiro elemento do botão que é o <i> e removendo a animação
+      element.firstElementChild.classList.remove(animation);
+    });
+  });
 });

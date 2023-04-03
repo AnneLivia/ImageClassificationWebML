@@ -27,21 +27,28 @@
                 <h1 id="app-title" class="fs-4 fw-bold">Recognition App</h1>
             </div>
         </div>
-        <!-- Area com video e uma mensagem de erro caso o video nao seja suportado -->
+        <!-- Rows com duas cols, uma para exibição do video e outra para painel de treinamento -->
         <div class="row justify-content-center mt-2">
+            <!-- Area com video -->
             <div class="col-md-5 text-center mt-2">
                 <video autoplay="true" id="webcam" class="hide rounded"></video>
             </div>
             <div class="col-md-4 col-sm-9 text-center mt-4 mb-2 align-self-center">
+                <!-- Card 1, exibido quando Card 2 ficar escondido "hide". Serve para exibir
+                os gestos reconhecimento através da webcam usando o modelo carregado ou treinado -->
                 <div class="card hide" id="detectedGestureIndicatorArea">
                     <h5 class="card-title mt-2 fw-bold">Gesto reconhecido</h5>
                     <div class="card-body mb-2">
+                        <!-- elemento que exibirá as imagens referentes as detecções -->
                         <img src="./assets/images/palm-scanner.png" alt="gesture recognized" id="recognizedClassImage">
                     </div>
                 </div>
+                <!-- Card 2, com os botões para inserir exemplos, treinar e salvar modelo -->
                 <div class="card hide" id="insertNewExamplesArea">
                     <h5 class="card-title mt-4 mb-3 fw-bold">Inserir Exemplos para treinamento</h5>
                     <div class="row justify-content-center">
+                        <!-- Cada botão abaixo possui um span que exibirá a quantidade de exemplos inseridos 
+                        para treinamento do modelo -->
                         <div class="mt-3 col-md-12 text-center">
                             <button class="btn btn-outline-dark mb-2 me-1" id="btAddExampleUp" type="button"><i
                                     class="fa-solid fa-arrow-up"></i>
@@ -67,16 +74,22 @@
                         </div>
                     </div>
                     <div class="row justify-content-center mt-4 mb-3">
-                        <div class="col-md-8 text-center">
+                        <div class="col-md-10 text-center">
                             <button class="btn btn-outline-primary mb-2 me-1 fw-bold" id="btTrainModel" type="button">
-                                Treinar Modelo
+                                <i class="fa-solid fa-wave-square"></i> Treinar Modelo
                             </button>
                             <button class="btn btn-outline-primary mb-2 me-1 fw-bold" id="btSaveModel" type="button">
-                                Baixar Modelo
+                                <i class="fa-solid fa-download"></i> Baixar Modelo
+                            </button>
+                            <!-- para usar, necessário carregar model.json e model.weights.bin -->
+                            <input id='modelDataFiles' type='file' hidden multiple />
+                            <button class="btn btn-outline-primary mb-2 me-1 fw-bold" id="btLoadModel" type="button">
+                                <i class="fa-solid fa-upload"></i> Carregar Modelo
                             </button>
                         </div>
                     </div>
                 </div>
+                <!-- Loading spinner usado para destacar o processo de treinamento -->
                 <div class="row justify-content-center mt-4 mb-2">
                     <div class="col-md-12 text-center">
                         <div class="spinner-border text-primary hide" role="status" id="loading">
@@ -86,25 +99,22 @@
                 </div>
             </div>
         </div>
+        <!-- Row para exibir mensagem de erro caso video não possa ser carregado -->
         <div class="row justify-content-center mt-2">
             <div class="col-md-3 hide text-center" id="errorVideoIndicatorArea"></div>
         </div>
+        <!-- Área usada para exibição dos feedbacks da aplicação-->
         <div class="row justify-content-center mt-3 mb-2">
             <p class='text-center fw-bold hide' id="modelFeedbackIndicatorArea"></p>
         </div>
-        <!-- Area com os botões -->
+        <!-- Area com os botões para usar efetivamente o modelo -->
         <div class="row justify-content-center mb-4">
             <div class="col-md-8 text-center">
-                <!-- para usar model.json e model.weights.bin -->
-                <input id='modelDataFiles' type='file' hidden multiple />
-                <button class="btn btn-outline-primary mb-2 me-1 fw-bold" id="btLoadModel" type="button">
-                    Carregar Modelo
-                </button>
                 <button class="btn btn-outline-success mb-2 me-1 fw-bold" id="btStartClassification" type="button">
-                    Iniciar Classificação
+                    <i class="me-1 fa-solid fa-circle-play"></i> Iniciar Classificação
                 </button>
                 <button class="btn btn-outline-success mb-2 me-1 fw-bold" id="btStoplassification" type="button">
-                    Parar Classificação
+                    <i class="me-1 fa-solid fa-circle-stop"></i> Parar Classificação
                 </button>
             </div>
         </div>
