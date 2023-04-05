@@ -1,5 +1,19 @@
 // Executar quando html tiver sido carregado
 document.addEventListener('DOMContentLoaded', async () => {
+  // criando novo jogo
+  const snakeGame = new SnakeGame(18, 18, 19, 100, {
+    boardColor: '#ededed',
+    snakeColor: '#573dff',
+    foodColor: '#ff2626',
+  });
+
+  // divs para controlar exibição de jogo e exibição de video
+  const gameArea = document.querySelector("#gameArea");
+  const videoArea = document.querySelector("#videoArea");
+
+  // botão para reiniciar jogo
+  const btRestartGame = document.querySelector("#btRestartGame");
+
   // div para exibir mensagem de erro caso a webcam não possa ser executada pelo browser
   const errorVideoIndicatorArea = document.querySelector(
     '#errorVideoIndicatorArea'
@@ -226,7 +240,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const controlArrowKeysBasedOnALabel = (label) => {
     // se não for a classe negativa, pode executar porque é a arrow key
     if (label !== 'negative') {
-      console.log(document.dispatchEvent(keys[label]));
       document.dispatchEvent(keys[label]);
     }
   };
@@ -253,6 +266,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   btStartClassification.addEventListener('click', () => {
     // se modelo customizado existe ou usuário colocou algum outro modelo, deve-se iniciar classificiação
     if (CustomModelClassifier.customModel || modelLoaded) {
+      // iniciar jogo
+      videoArea.classList.add('hide');
+      gameArea.classList.remove('hide');
+      snakeGame.startGame();
       // para ficar em loop a classificação
       shouldClassify = true;
       // para mostrar os resultados da classificação com imagens e escoder a área referente ao treinamento
@@ -268,6 +285,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   btStoplassification.addEventListener('click', () => {
+    // parar jogo
+    videoArea.classList.remove('hide');
+    gameArea.classList.add('hide');
     // esconde card de exibição de resultados e exibe card para efetuar treinamento
     detectedGestureIndicatorArea.classList.add('hide');
     insertNewExamplesArea.classList.remove('hide');
@@ -325,4 +345,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       element.firstElementChild.classList.remove(animation);
     });
   });
+
+  btRestartGame.addEventListener('click', () => {
+    snakeGame.restartGame();
+  })
 });
