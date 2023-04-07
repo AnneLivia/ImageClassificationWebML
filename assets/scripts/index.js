@@ -8,11 +8,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // divs para controlar exibição de jogo e exibição de video
-  const gameArea = document.querySelector("#gameArea");
-  const videoArea = document.querySelector("#videoArea");
+  const gameArea = document.querySelector('#gameArea');
+  const videoArea = document.querySelector('#videoArea');
 
   // botão para reiniciar jogo
-  const btRestartGame = document.querySelector("#btRestartGame");
+  const btRestartGame = document.querySelector('#btRestartGame');
 
   // div para exibir mensagem de erro caso a webcam não possa ser executada pelo browser
   const errorVideoIndicatorArea = document.querySelector(
@@ -70,23 +70,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   const totalExamplesAddedToTrain = {
     up: {
       quantity: 0,
-      document: document.querySelector('#numberExamplesUp'),
+      element: document.querySelector('#numberExamplesUp'),
     },
     left: {
       quantity: 0,
-      document: document.querySelector('#numberExamplesLeft'),
+      element: document.querySelector('#numberExamplesLeft'),
     },
     right: {
       quantity: 0,
-      document: document.querySelector('#numberExamplesRight'),
+      element: document.querySelector('#numberExamplesRight'),
     },
     down: {
       quantity: 0,
-      document: document.querySelector('#numberExamplesDown'),
+      element: document.querySelector('#numberExamplesDown'),
     },
     negative: {
       quantity: 0,
-      document: document.querySelector('#numberExamplesNegative'),
+      element: document.querySelector('#numberExamplesNegative'),
     },
   };
 
@@ -97,6 +97,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   let shouldClassify = false;
   // para deteminar se um modelo foi carregado, se esse for o caso então deve-se permitir iniciar classificação com ele
   let modelLoaded = false;
+  // para definir o número de exemplos a ser adicionado
+  const MAX_IMAGENS_USED_TO_TRAIN = 150;
 
   // para precionar as arrow keys
   const keys = {
@@ -138,6 +140,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         "<img src='./assets/images/no-video.png' alt='No video icon' />" +
         "<p class='mt-3'>Não foi possível acessar a sua Webcam</p>";
 
+      // desabilitar botões de iniciar e parar classificação
+      btStartClassification.disabled = true;
+      btStoplassification.disabled = true;
+
       console.error(error.message);
     }
   }
@@ -165,8 +171,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   const addNewTrainData = async (label) => {
+    // número máximo de exemplos
+    if (overallTotal >= MAX_IMAGENS_USED_TO_TRAIN) {
+      modelFeedbackIndicatorArea.classList.remove('hide');
+      return (modelFeedbackIndicatorArea.innerText = `O número máximo de imagens para treinamento (${MAX_IMAGENS_USED_TO_TRAIN}) foi atingido`);
+    }
+
     // incrementando a quantidade de uma label especifica e já exibido na tela
-    totalExamplesAddedToTrain[label].document.innerText =
+    totalExamplesAddedToTrain[label].element.innerText =
       ++totalExamplesAddedToTrain[label].quantity;
 
     overallTotal += 1;
@@ -177,24 +189,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   };
 
-  btUp.addEventListener('click', () => {
-    addNewTrainData('up');
-  });
+  const btUsedToaddTrainData = [
+    {
+      element: btDown,
+      label: 'down',
+    },
+    {
+      element: btLeft,
+      label: 'left',
+    },
+    {
+      element: btUp,
+      label: 'up',
+    },
+    {
+      element: btRight,
+      label: 'right',
+    },
+    {
+      element: btNegative,
+      label: 'negative',
+    },
+  ];
 
-  btDown.addEventListener('click', () => {
-    addNewTrainData('down');
-  });
-
-  btLeft.addEventListener('click', () => {
-    addNewTrainData('left');
-  });
-
-  btRight.addEventListener('click', () => {
-    addNewTrainData('right');
-  });
-
-  btNegative.addEventListener('click', () => {
-    addNewTrainData('negative');
+  // inserindo os eventos de inserir imagem para treinamnto quando mouse estiver sobre o botão
+  btUsedToaddTrainData.forEach((btn) => {
+    btn.element.addEventListener('click', () => {
+      addNewTrainData(btn.label);
+    });
   });
 
   btTrainModel.addEventListener('click', () => {
@@ -334,7 +356,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   listOfButtonsElementsToAddHover.forEach((element) => {
     const animation = 'fa-beat-fade';
-    
+
     element.addEventListener('mouseover', () => {
       // obtendo primeiro elemento do botão que é o <i> e colocando a animação
       element.firstElementChild.classList.add(animation);
@@ -348,5 +370,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   btRestartGame.addEventListener('click', () => {
     snakeGame.restartGame();
-  })
+  });
 });
