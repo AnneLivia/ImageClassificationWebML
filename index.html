@@ -16,10 +16,6 @@
     <!-- Defer, o script será executado após pagina HTML tiver sido toda analisada
     mas o download é feito no background assincronamente-->
     <script defer src="./assets/scripts/index.js"></script>
-    <!-- Importando o jogo para ser controlado -->
-    <script defer src="./assets/scripts/snake.js"></script>
-    <!-- CSS do jogo -->
-    <link rel="stylesheet" href="./assets/styles/snake.css" />
 </head>
 
 <body>
@@ -36,15 +32,6 @@
             <!-- Area com video -->
             <div class="col-md-4 text-center mt-2" id="videoArea">
                 <video autoplay="true" id="webcam" class="hide rounded"></video>
-            </div>
-            <!-- Area com o jogo-->
-            <div class="col-md-5 text-center mt-2 hide" id="gameArea">
-                <div class="mt-4">
-                    <canvas id="canvasSnakeGame"></canvas>
-                </div>
-                <button class="btn btn-outline-dark mt-2 mb-2 me-1 fw-bold" id="btRestartGame" type="button">
-                    Reiniciar
-                </button>
             </div>
             <div class="col-md-4 col-sm-9 text-center mt-4 mb-2 align-self-center">
                 <!-- Card 1, exibido quando Card 2 ficar escondido "hide". Serve para exibir
@@ -126,7 +113,7 @@
                 <button class="btn btn-outline-success mb-2 me-1 fw-bold" id="btStartClassification" type="button">
                     <i class="me-1 fa-solid fa-circle-play"></i> Iniciar Classificação
                 </button>
-                <button class="btn btn-outline-success mb-2 me-1 fw-bold" id="btStoplassification" type="button">
+                <button class="btn btn-outline-success mb-2 me-1 fw-bold" id="btStopClassification" type="button">
                     <i class="me-1 fa-solid fa-circle-stop"></i> Parar Classificação
                 </button>
             </div>

@@ -1,18 +1,8 @@
 // Executar quando html tiver sido carregado
 document.addEventListener('DOMContentLoaded', async () => {
-  // criando novo jogo
-  const snakeGame = new SnakeGame(18, 18, 19, 100, {
-    boardColor: '#ededed',
-    snakeColor: '#573dff',
-    foodColor: '#ff2626',
-  });
 
-  // divs para controlar exibição de jogo e exibição de video
-  const gameArea = document.querySelector('#gameArea');
+  // divs para controlar exibição de video
   const videoArea = document.querySelector('#videoArea');
-
-  // botão para reiniciar jogo
-  const btRestartGame = document.querySelector('#btRestartGame');
 
   // div para exibir mensagem de erro caso a webcam não possa ser executada pelo browser
   const errorVideoIndicatorArea = document.querySelector(
@@ -56,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const btStartClassification = document.querySelector(
     '#btStartClassification'
   );
-  const btStoplassification = document.querySelector('#btStoplassification');
+  const btStopClassification = document.querySelector('#btStopClassification');
 
   // input referente a inserção dos arquivos do modelo baixado (model e weights)
   const modelDataFiles = document.querySelector('#modelDataFiles');
@@ -142,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // desabilitar botões de iniciar e parar classificação
       btStartClassification.disabled = true;
-      btStoplassification.disabled = true;
+      btStopClassification.disabled = true;
 
       console.error(error.message);
     }
@@ -288,10 +278,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   btStartClassification.addEventListener('click', () => {
     // se modelo customizado existe ou usuário colocou algum outro modelo, deve-se iniciar classificiação
     if (CustomModelClassifier.customModel || modelLoaded) {
-      // iniciar jogo
-      videoArea.classList.add('hide');
-      gameArea.classList.remove('hide');
-      snakeGame.startGame();
       // para ficar em loop a classificação
       shouldClassify = true;
       // para mostrar os resultados da classificação com imagens e escoder a área referente ao treinamento
@@ -306,10 +292,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       'Treine um novo modelo antes de iniciar a classificação';
   });
 
-  btStoplassification.addEventListener('click', () => {
-    // parar jogo
-    videoArea.classList.remove('hide');
-    gameArea.classList.add('hide');
+  btStopClassification.addEventListener('click', () => {
     // esconde card de exibição de resultados e exibe card para efetuar treinamento
     detectedGestureIndicatorArea.classList.add('hide');
     insertNewExamplesArea.classList.remove('hide');
@@ -346,7 +329,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     btSaveModel,
     btLoadModel,
     btStartClassification,
-    btStoplassification,
+    btStopClassification,
     btDown,
     btLeft,
     btUp,
@@ -366,9 +349,5 @@ document.addEventListener('DOMContentLoaded', async () => {
       // obtendo primeiro elemento do botão que é o <i> e removendo a animação
       element.firstElementChild.classList.remove(animation);
     });
-  });
-
-  btRestartGame.addEventListener('click', () => {
-    snakeGame.restartGame();
   });
 });
