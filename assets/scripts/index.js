@@ -31,10 +31,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const video = document.querySelector('#webcam');
 
   // referencia para todos os botões de exemplos
-  const btUp = document.querySelector('#btAddExampleUp');
-  const btDown = document.querySelector('#btAddExampleDown');
-  const btLeft = document.querySelector('#btAddExampleLeft');
-  const btRight = document.querySelector('#btAddExampleRight');
+  const btAddExampleILikeIt = document.querySelector('#btAddExampleILikeIt');
+  const btAddExampleIDontLikeIt = document.querySelector('#btAddExampleIDontLikeIt');
   const btNegative = document.querySelector('#btAddExampleNegative');
 
   // botões para manipulação do modelo
@@ -58,21 +56,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // cada key possui a quantidade para concatenar na medida em que novos itens
   // são inseridos e o documento referente ao span para exibição do número na interface
   const totalExamplesAddedToTrain = {
-    up: {
+    ILikeIt: {
       quantity: 0,
-      element: document.querySelector('#numberExamplesUp'),
+      element: document.querySelector('#numberExamplesILikeIt'),
     },
-    left: {
+    IDontLikeIt: {
       quantity: 0,
-      element: document.querySelector('#numberExamplesLeft'),
-    },
-    right: {
-      quantity: 0,
-      element: document.querySelector('#numberExamplesRight'),
-    },
-    down: {
-      quantity: 0,
-      element: document.querySelector('#numberExamplesDown'),
+      element: document.querySelector('#numberExamplesIDontLikeIt'),
     },
     negative: {
       quantity: 0,
@@ -89,23 +79,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   let modelLoaded = false;
   // para definir o número de exemplos a ser adicionado
   const MAX_IMAGENS_USED_TO_TRAIN = 150;
-
-  // para precionar as arrow keys
-  const keys = {
-    up: new KeyboardEvent('keydown', {
-      key: 'ArrowUp',
-    }),
-    down: new KeyboardEvent('keydown', {
-      key: 'ArrowDown',
-    }),
-
-    left: new KeyboardEvent('keydown', {
-      key: 'ArrowLeft',
-    }),
-    right: new KeyboardEvent('keydown', {
-      key: 'ArrowRight',
-    }),
-  };
 
   // verificar se a webcam é suportada pelo browser
   if (navigator.mediaDevices.getUserMedia) {
@@ -181,20 +154,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const btUsedToaddTrainData = [
     {
-      element: btDown,
-      label: 'down',
+      element: btAddExampleIDontLikeIt,
+      label: 'IDontLikeIt',
     },
     {
-      element: btLeft,
-      label: 'left',
-    },
-    {
-      element: btUp,
-      label: 'up',
-    },
-    {
-      element: btRight,
-      label: 'right',
+      element: btAddExampleILikeIt,
+      label: 'ILikeIt',
     },
     {
       element: btNegative,
@@ -248,22 +213,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       'Treine um novo modelo antes de salvar';
   });
 
-  // metodo usado para controlar as arrow keys do teclado
-  const controlArrowKeysBasedOnALabel = (label) => {
-    // se não for a classe negativa, pode executar porque é a arrow key
-    if (label !== 'negative') {
-      document.dispatchEvent(keys[label]);
-    }
-  };
-
   // metodo usado dentro de classify para exibir resultado ou erro caso haja algum
   const getLabelsReturnedFromModel = (error, results) => {
     if (error) {
       return console.log(error.message);
     }
-
-    // controlando tecla
-    controlArrowKeysBasedOnALabel(results[0].label);
 
     // ao reconhecer alguma classe, colocar a imagem especifica
     recognizedClassImage.src = `./assets/images/${results[0].label}.png`;
@@ -330,10 +284,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     btLoadModel,
     btStartClassification,
     btStopClassification,
-    btDown,
-    btLeft,
-    btUp,
-    btRight,
+    btAddExampleIDontLikeIt,
+    btAddExampleILikeIt,
     btNegative,
   ];
 
