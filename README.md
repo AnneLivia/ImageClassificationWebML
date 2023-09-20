@@ -4,5 +4,4 @@ In this application, its being performed training and classification tasks utili
 
 ## Interface 
 
-
-![p1](https://github.com/AnneLivia/ImageClassificationWebML/assets/31932673/e7c80fb3-0455-4b84-aa2c-013d1d54f161)
+![p1](https://github.com/AnneLivia/ImageClassificationWebML/assets/31932673/a4ba7096-9dcb-424f-a0dd-8bbe99274af0)
